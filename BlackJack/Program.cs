@@ -230,7 +230,7 @@ namespace BlackJack
                     break;
                 Console.WriteLine("{0} {1} - {2}", card.Name, card.Suit, card.Volume);
             }
-
+            // comm
             Console.ReadKey();
         }
     }
