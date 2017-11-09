@@ -85,7 +85,6 @@ namespace BlackJack
             return firstMove;
         }
 
-
         static void Main(string[] args)
         {
             Card[] packOfCards = PackOfCard();
@@ -97,18 +96,21 @@ namespace BlackJack
 
             Console.WriteLine("=============== After Shuffle ================");
             Card[] pack = PackShuffle(packOfCards);
-            foreach (var card in pack)
-            {
-                Console.WriteLine("{0} {1} - {2}", card.Name, card.Suit, card.Volume);
-            }
+            //foreach (var card in pack)
+            //{
+            //    Console.WriteLine("{0} {1} - {2}", card.Name, card.Suit, card.Volume);
+            //}
 
-            int whoMove = ChooseFirstMove();
+            int whoFirstMove = ChooseFirstMove();
+            int whoMove = whoFirstMove;
 
             Card[] playersCards = new Card[30];
             Card[] computersCards = new Card[30];
 
+            bool finishMove = false;
             bool finishGame = false;
 
+            int sumVolume = 0;
             int cardNumInPack = 0;
             int cardNumInPlayersPack = 0;
             int cardNumInComputersPack = 0;
@@ -117,119 +119,186 @@ namespace BlackJack
                 Card actCard = pack[cardNumInPack];
                 if (whoMove == 1)
                 {
-                    if (cardNumInPack < 4)
+                    if (cardNumInPack < 4)   // первоначальная раздача по 2 карты
                     {
                         computersCards[cardNumInComputersPack++] = actCard;
                         cardNumInPack++;
                     }
                     else
                     {
-                        Console.WriteLine("===== Computers Cards");
-                        int sumVolume = 0;
-                        foreach (var card in computersCards)
+                        finishMove = false;
+                        while (finishMove == false)
                         {
-                            if (card.Volume == 0)
-                                break;
-                            sumVolume = sumVolume + card.Volume;
-                            Console.WriteLine("{0} {1} - {2}", card.Name, card.Suit, card.Volume);
-                        }
-                        Console.WriteLine("===== You have {0} points", sumVolume);
-                        int result = 0;
-                        bool inputRezult = false;
-                        while (inputRezult == false)
-                        {
-                            Console.Write("Do You continue (1) or finish (0)?");
-                            inputRezult = int.TryParse(Console.ReadLine(), out result);
-                            if (inputRezult == true)
+                            Console.WriteLine("===== Computers Cards");
+                            sumVolume = 0;
+                            foreach (var card in computersCards)
                             {
-                                if (result < 0 || result > 1)
+                                if (card.Volume == 0)
+                                    break;
+                                sumVolume = sumVolume + card.Volume;
+                                Console.WriteLine("{0} {1} - {2}", card.Name, card.Suit, card.Volume);
+                            }
+                            Console.WriteLine("===== You have {0} points", sumVolume);
+                            if (sumVolume == 21)
+                            {
+                                if (whoFirstMove == 1)
                                 {
-                                    inputRezult = false;
+                                    Console.WriteLine("Yoy Lose. Comp WIN!!!");
+                                    finishMove = true;
+                                    finishGame = true;
+                                    break;
                                 }
                             }
-                            if (inputRezult == false)
+                            else if (sumVolume > 21)
                             {
-                                Console.WriteLine("Don't correct input. Choose only 0 or 1.");
+                                finishMove = true;
+                                if (whoFirstMove == 2)
+                                {
+                                    finishGame = true;
+                                }
+                                break;
                             }
-                        }
-                        if (result == 0)
-                        {
-                            finishGame = true;
-                        }
-                        else
-                        {
-                            computersCards[cardNumInComputersPack++] = actCard;
-                            cardNumInPack++;
+                            int result = 0;
+                            bool inputRezult = false;
+                            while (inputRezult == false)
+                            {
+                                Console.Write("Do You take next card (1) or finish (0)?");
+                                inputRezult = int.TryParse(Console.ReadLine(), out result);
+                                if (inputRezult == true)
+                                {
+                                    if (result < 0 || result > 1)
+                                    {
+                                        inputRezult = false;
+                                    }
+                                }
+                                if (inputRezult == false)
+                                {
+                                    Console.WriteLine("Don't correct input. Choose only 0 or 1.");
+                                }
+                            }
+                            if (result == 0)
+                            {
+                                finishMove = true;
+                                if (whoFirstMove == 2)
+                                {
+                                    finishGame = true;
+                                }
+                            }
+                            else
+                            {
+                                computersCards[cardNumInComputersPack++] = actCard;
+                                actCard = pack[cardNumInPack++];
+                            }
                         }
                     }
                     whoMove = 0;
                 }
                 else
                 {
-                    if (cardNumInPack < 4)
+                    if (finishGame == true)
+                    {
+                        break;
+                    }
+                    if (cardNumInPack < 4)   // первоначальная раздача по 2 карты
                     {
                         playersCards[cardNumInPlayersPack++] = actCard;
                         cardNumInPack++;
                     }
                     else
+
                     {
-                        Console.WriteLine("===== Players Cards");
-                        int sumVolume = 0;
-                        foreach (var card in playersCards)
+                        finishMove = false;
+                        while (finishMove == false)
                         {
-                            if (card.Volume == 0)
-                                break;
-                            sumVolume = sumVolume + card.Volume;
-                            Console.WriteLine("{0} {1} - {2}", card.Name, card.Suit, card.Volume);
-                        }
-                        Console.WriteLine("===== You have {0} points", sumVolume);
-                        int result = 0;
-                        bool inputRezult = false;
-                        while (inputRezult == false)
-                        {
-                            Console.Write("Do You continue (1) or finish (0)?");
-                            inputRezult = int.TryParse(Console.ReadLine(), out result);
-                            if (inputRezult == true)
+                            Console.WriteLine("===== Players Cards");
+                            sumVolume = 0;
+                            foreach (var card in playersCards)
                             {
-                                if (result < 0 || result > 1)
+                                if (card.Volume == 0)
+                                    break;
+                                sumVolume = sumVolume + card.Volume;
+                                Console.WriteLine("{0} {1} - {2}", card.Name, card.Suit, card.Volume);
+                            }
+                            Console.WriteLine("===== You have {0} points", sumVolume);
+                            if (sumVolume == 21)
+                            {
+                                if (whoFirstMove == 1)
                                 {
-                                    inputRezult = false;
+                                    Console.WriteLine("Yoy WIN!!! Comp is loser!!!");
+                                    finishMove = true;
+                                    finishGame = true;
+                                    break;
                                 }
                             }
-                            if (inputRezult == false)
+                            else if (sumVolume > 21)
                             {
-                                Console.WriteLine("Don't correct input. Choose only 0 or 1.");
+                                finishMove = true;
+                                if (whoFirstMove == 1)
+                                {
+                                    finishGame = true;
+                                }
+                                break;
                             }
-                        }
-                        if (result == 0)
-                        {
-                            finishGame = true;
-                        }
-                        else
-                        {
-                            playersCards[cardNumInPlayersPack++] = actCard;
-                            cardNumInPack++;
+                            int result = 0;
+                            bool inputRezult = false;
+                            while (inputRezult == false)
+                            {
+                                Console.Write("Do You take next card (1) or finish (0)?");
+                                inputRezult = int.TryParse(Console.ReadLine(), out result);
+                                if (inputRezult == true)
+                                {
+                                    if (result < 0 || result > 1)
+                                    {
+                                        inputRezult = false;
+                                    }
+                                }
+                                if (inputRezult == false)
+                                {
+                                    Console.WriteLine("Don't correct input. Choose only 0 or 1.");
+                                }
+                            }
+                            if (result == 0)
+                            {
+                                finishMove = true;
+                                if (whoFirstMove == 1)
+                                {
+                                    finishGame = true;
+                                }
+                            }
+                            else
+                            {
+                                playersCards[cardNumInPlayersPack++] = actCard;
+                                actCard = pack[cardNumInPack++];
+                            }
                         }
                     }
                     whoMove = 1;
                 };
 
             }
-
+            Console.WriteLine("*****************************************************************");
+            sumVolume = 0;
             Console.WriteLine("===== Players Cards:");
             foreach (var card in playersCards)
             {
                 if (card.Volume == 0)
                     break;
                 Console.WriteLine("{0} {1} - {2}", card.Name, card.Suit, card.Volume);
+                sumVolume = sumVolume + card.Volume;
             }
-            Console.WriteLine("===== Computers Cards");
+            Console.WriteLine("===== Players total volume = {0}", sumVolume);
+            Console.WriteLine("*****************************************************************");
+            sumVolume = 0;
+            Console.WriteLine("===== Computers Cards:");
             foreach (var card in computersCards)
             {
                 if (card.Volume == 0)
                     break;
                 Console.WriteLine("{0} {1} - {2}", card.Name, card.Suit, card.Volume);
+                sumVolume = sumVolume + card.Volume;
             }
+            Console.WriteLine("===== Computers total volume = {0}", sumVolume);
+            Console.WriteLine("*****************************************************************");
             // comm
             Console.ReadKey();
         }
